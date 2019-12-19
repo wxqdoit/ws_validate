@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+
+<div id="area">
+    <div>
+        <input type="text" id="gender"/>
+    </div>
+    <div>
+        <input type="text" id="age" data-d="2134"/>
+    </div>
+    <div>
+        <button id="btn2">submit</button>
+    </div>
+</div>
+
+<div>
+    <div>
+        <input type="text" id="username"/>
+    </div>
+    <div>
+        <input type="text" id="password"/>
+    </div>
+</div>
+
+<script src="WsValidate.js"></script>
+<script>
+
+    let wsv = new WsValidate({
+        el: [
+            {
+                el: '#username',
+                // onBlur(data) {
+                //     console.log(data)
+                // },
+                onInput(data){
+                    console.log(data)
+                }
+            },
+            {el: '#password'},
+        ],
+        autoValidate: true,
+        tagNames: ['input', 'select']
+    });
+
+    let wsv1 = new WsValidate({
+        el:'#area',
+        onBlur(data){
+            console.log(data)
+        },
+        autoValidate: true,
+        tagNames: ['input', 'select']
+    });
+
+    document.querySelector("#btn2").onclick = function () {
+        console.log(wsv)
+    };
+    document.getElementById('password').onchange
+
+
+
+</script>
+
+</body>
+</html>
+
