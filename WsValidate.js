@@ -122,6 +122,8 @@
                     },
                     onChange: arg.onChange || function () {
                     },
+                    onInput:arg.onInput ||function () {
+                    },
                 }
             } else {
                 return this;
@@ -139,7 +141,6 @@
                 autoValidate(this.config.el, this)
             }
         }
-
     }
 
     /**
@@ -187,58 +188,97 @@
             }
         }
     }
-
+    let cNode,cEl;
     /**
      * Blur event implement.
      * @param ctx
      * @param node
-     * @param fn
      */
     function onEventImpl(node, ctx) {
         if (isString(node.el)) {
             if (node.el) {
                 let el = document.querySelector(node.el);
-                if (!isNull(el)) {
-
-                    if (node.onBlur && typeof node.onBlur === 'function') {
-
-                        el.onblur = () => {
-                            node.value = el.value;
-                            node.dataset = el.dataset || '';
-                            node.id = el.getAttribute('id');
-                            node.klass = el.getAttribute('class');
-                            node.onBlur(node)
-                        }
-                    }
-
-                    if (node.onInput && typeof node.onInput === 'function') {
-                        el.oninput = function () {
-                            node.value = el.value;
-                            node.dataset = el.dataset || '';
-                            node.id = el.getAttribute('id');
-                            node.klass = el.getAttribute('class');
-                            node.onInput(node)
-                        }
-                    }
-
-                } else {
+                if (isNull(el)) {
                     throw new Error(node.el + " can not be found.")
+                } else {
+                    cNode = node;
+                    cEl = el;
+                    if (node.onBlur && typeof node.onBlur === 'function') {
+                        if(el.addEventListener){
+                            el.removeEventListener('blur',bindOnBlur,false);
+                            el.addEventListener('blur',bindOnBlur,false)
+                        }
+                        if(el.attachEvent){
+                            el.detachEvent('onblur',bindOnBlur);
+                            el.attachEvent('onblur',bindOnBlur)
+                        }
+                    }
+                    if (node.onInput && typeof node.onInput === 'function') {
+                        if(el.addEventListener){
+                            el.removeEventListener('input',bindOnInput,false);
+                            el.addEventListener('input',bindOnInput,false)
+                        }
+                        if(el.attachEvent){
+                            el.detachEvent('oninput',bindOnInput);
+                            el.attachEvent('oninput',bindOnInput)
+                        }
+                    }
+                    if (node.onChange && typeof node.onChange === 'function') {
+                        if(el.addEventListener){
+                            el.removeEventListener('change',bindOnChange,false);
+                            el.addEventListener('change',bindOnChange,false)
+                        }
+                        if(el.attachEvent){
+                            el.detachEvent('onchange',bindOnChange);
+                            el.attachEvent('onchange',bindOnChange)
+                        }
+                    }
                 }
             } else {
                 throw new Error("Field of 'el' required.")
             }
         } else {
-            node.el.onblur = () => {
-                node.value = node.el.value;
-                ctx.config.onBlur(node)
-            };
-            node.el.onchange = () => {
-                node.value = node.el.value;
-                ctx.config.onChange(node)
+            if(node.el.addEventListener){
+                node.el.removeEventListener('blur',()=>{
+                    node.value = node.el.value;
+                    ctx.config.onBlur(node)
+                },false);
+                node.el.addEventListener('blur',()=>{
+                    node.value = node.el.value;
+                    ctx.config.onBlur(node)
+                },false)
+            }
+            if(node.el.attachEvent){
+                node.el.detachEvent('onblur',()=>{
+                    node.value = node.el.value;
+                    ctx.config.onChange(node)
+                });
+                node.el.attachEvent('onblur',()=>{
+                    node.value = node.el.value;
+                    ctx.config.onChange(node)
+                })
             }
         }
     }
-
+    function bindOnInput(){
+        buildReturnObj(cNode,cEl);
+        console.trace()
+        cNode.onInput(cNode)
+    }
+    function bindOnChange(){
+        buildReturnObj(cNode,cEl);
+        cNode.onChange(cNode)
+    }
+    function bindOnBlur(){
+        buildReturnObj(cNode,cEl);
+        cNode.onBlur(cNode)
+    }
+    function buildReturnObj(node,el){
+        node.value = el.value;
+        node.dataset = el.dataset || '';
+        node.id = el.getAttribute('id');
+        node.klass = el.getAttribute('class');
+    }
     /**
      * dom obj to array.
      * @param el
