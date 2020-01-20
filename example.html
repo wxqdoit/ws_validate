@@ -79,7 +79,9 @@
         <input type="text" id="password"/>
     </div>
 </div>
+<div id="flashBox"></div>
 <user-card></user-card>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <script src="WsValidate.js"></script>
 <script>
 
@@ -159,6 +161,28 @@
             }
         }
         return fastSort(left).concat([p],fastSort(right))
+    }
+    function copyText (txt) {
+        if (window.clipboardData) window.clipboardData.setData ('Text', txt);
+        else {
+            var flashBox = document.getElementById ('flashBox');
+            if (!flashBox) {
+                flashBox = document.createElement ('div');
+                flashBox.id = 'flashBox';
+                document.body.appendChild (flashBox);
+            }
+            flashBox.innerHTML = '<embed src="clipboard.swf" FlashVars="clipboard=' + escape (txt) + '" '+'width="0" height="0" type="application/x-shockwave-flash"></embed>';
+        }
+    }
+
+    window.onload =function (e) {
+        // let pastedText = undefined;
+        // if (window.clipboardData && window.clipboardData.getData) { // IE
+        //     pastedText = window.clipboardData.getData('Text');
+        // } else {
+        //     pastedText = e.originalEvent.clipboardData.getData('Text');//e.clipboardData.getData('text/plain');
+        // }
+        console.log(copyText('111111'))
     }
 
 </script>
